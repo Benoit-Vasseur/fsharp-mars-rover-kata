@@ -40,26 +40,16 @@ type Command =
     | TurnClockWise
     | TurnCounterClockWise
 
-
-let move (direction: Direction) (coordinates: Coordinates) (movingCommand: MovingCommand): Coordinates =
-    let x, y = coordinates
-    match direction with
-    | North ->
-        match movingCommand with
-        | Forward -> (x, y + CoordinateUnit 1)
-        | Backward -> (x, y - CoordinateUnit 1)
-    | East ->
-        match movingCommand with
-        | Forward -> (x + CoordinateUnit 1, y)
-        | Backward -> (x - CoordinateUnit 1, y)
-    | South ->
-        match movingCommand with
-        | Forward -> (x, y - CoordinateUnit 1)
-        | Backward -> (x, y + CoordinateUnit 1)
-    | West ->
-        match movingCommand with
-        | Forward -> (x - CoordinateUnit 1, y)
-        | Backward -> (x + CoordinateUnit 1, y)
+let move (direction: Direction) ((x, y): Coordinates) (movingCommand: MovingCommand): Coordinates =
+    match (direction, movingCommand) with
+    | (North, Forward)
+    | (South, Backward) -> (x, y + CoordinateUnit 1)
+    | (North, Backward)
+    | (South, Forward) -> (x, y - CoordinateUnit 1)
+    | (East, Forward)
+    | (West, Backward) -> (x + CoordinateUnit 1, y)
+    | (East, Backward)
+    | (West, Forward) -> (x - CoordinateUnit 1, y)
 
 let turn (direction: Direction) (turiningCommand: TurningCommand): Direction =
     match turiningCommand with
@@ -82,8 +72,6 @@ let commandRover (rover: Rover) (command: Command): Rover =
     | MoveBackward -> { rover with Coordinates = move rover.Direction rover.Coordinates Backward }
     | TurnClockWise -> { rover with Direction = turn rover.Direction ClockWise }
     | TurnCounterClockWise -> { rover with Direction = turn rover.Direction CounterClockWise }
-
-let printCoordinates (tw: TextWriter) (x, y) = tw.Write("X:{0} Y:{1}", x, y)
 
 let printRover (tw: TextWriter) (rover: Rover) =
     let x, y = rover.Coordinates
